@@ -27,8 +27,8 @@ import numpy as np
 import sys
 import pickle
 tf.enable_eager_execution()
+os.environ["CUDA_VISIBLE_DEVICES"]="0"
 flags = tf.flags
-
 FLAGS = flags.FLAGS
 
 ## Required parameters
