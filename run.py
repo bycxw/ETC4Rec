@@ -533,6 +533,7 @@ def main(_):
     print("make checkpoint dir succuss")
     train_input_files = []
     for input_pattern in FLAGS.train_input_file.split(","):
+        print("input_pattern: ", input_pattern)
         train_input_files.extend(tf.gfile.Glob(input_pattern))
 
     test_input_files = []
@@ -547,7 +548,7 @@ def main(_):
         tf.logging.info("  %s" % input_file)
 
     tf.logging.info("*** test Input Files ***")
-    for input_file in train_input_files:
+    for input_file in test_input_files:
         tf.logging.info("  %s" % input_file)
 
     tpu_cluster_resolver = None
