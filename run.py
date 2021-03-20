@@ -527,7 +527,7 @@ def main(_):
     model_config = modeling.ModelConfig.from_json_file(FLAGS.model_config_file)
 
     print("make checkpoint dir: ", FLAGS.checkpointDir)
-    tf.io.gfile.mkdir(FLAGS.checkpointDir)
+    tf.io.gfile.makedirs(FLAGS.checkpointDir)
     print("make checkpoint dir succuss")
     train_input_files = []
     for input_pattern in FLAGS.train_input_file.split(","):
