@@ -22,7 +22,7 @@ import os
 import modeling
 import optimization
 import tensorflow.compat.v1 as tf
-tf.disable_v2_behavior()
+# tf.disable_v2_behavior()
 import numpy as np
 import sys
 import pickle
@@ -187,6 +187,8 @@ class EvalHooks(tf.train.SessionRunHook):
             (-1, FLAGS.max_predictions_per_seq, masked_lm_log_probs.shape[1]))
 #         print("loss value:", masked_lm_log_probs.shape, input_ids.shape,
 #               masked_lm_ids.shape, info.shape)
+
+        print("length of input_ids: ", len(input_ids))
 
         for idx in range(len(input_ids)):
             rated = set(input_ids[idx])
