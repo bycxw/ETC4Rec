@@ -1,4 +1,4 @@
-CKPT_DIR="/mnt/c/Data/dissertation/EBERT4Rec/record"
+CKPT_DIR="/home/mist/cloud/data/record"
 dataset_name="beauty"
 max_seq_length=50
 global_seq_length=16

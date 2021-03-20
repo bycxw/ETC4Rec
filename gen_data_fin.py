@@ -57,7 +57,7 @@ flags.DEFINE_integer(
 flags.DEFINE_float("prop_sliding_window", 0.1, "sliding window step size.")
     
 flags.DEFINE_string(
-    "data_dir", './data/',
+    "data_dir", '../data/',
     "data dir.")
 
 flags.DEFINE_string(
