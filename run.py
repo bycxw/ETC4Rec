@@ -188,8 +188,6 @@ class EvalHooks(tf.train.SessionRunHook):
 #         print("loss value:", masked_lm_log_probs.shape, input_ids.shape,
 #               masked_lm_ids.shape, info.shape)
 
-        print("length of input_ids: ", len(input_ids))
-
         for idx in range(len(input_ids)):
             rated = set(input_ids[idx])
             rated.add(0)
@@ -530,10 +528,9 @@ def main(_):
 
     print("make checkpoint dir: ", FLAGS.checkpointDir)
     tf.io.gfile.makedirs(FLAGS.checkpointDir)
-    print("make checkpoint dir succuss")
+
     train_input_files = []
     for input_pattern in FLAGS.train_input_file.split(","):
-        print("input_pattern: ", input_pattern)
         train_input_files.extend(tf.gfile.Glob(input_pattern))
 
     test_input_files = []

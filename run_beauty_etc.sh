@@ -10,8 +10,8 @@ max_predictions_per_seq=30
 masked_lm_prob=0.6
 
 dim=64
-batch_size=32
-num_train_steps=200
+batch_size=128
+num_train_steps=2000
 
 mask_prob=1.0
 prop_sliding_window=0.1
