@@ -1,7 +1,7 @@
 #CKPT_DIR="/mnt/c/Data/dissertation/data/record"
 #DATA_DIR="/mnt/c/Data/dissertation/data/"
 CKPT_DIR="/home/mist/data/record"
-DATA_DIR="/home/mist/data/"
+DATA_DIR="/home/mist/data"
 dataset_name="beauty"
 max_seq_length=50
 global_seq_length=16
