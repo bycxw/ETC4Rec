@@ -1,3 +1,5 @@
+#CKPT_DIR="/mnt/c/Data/dissertation/data/record"
+#DATA_DIR="/mnt/c/Data/dissertation/data/"
 CKPT_DIR="/home/mist/data/record"
 DATA_DIR="/home/mist/data/"
 dataset_name="beauty"
@@ -8,7 +10,7 @@ max_predictions_per_seq=30
 masked_lm_prob=0.6
 
 dim=64
-batch_size=128
+batch_size=32
 num_train_steps=200
 
 mask_prob=1.0
