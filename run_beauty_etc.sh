@@ -1,4 +1,5 @@
 CKPT_DIR="/home/mist/data/record"
+DATA_DIR="/home/mist/data/"
 dataset_name="beauty"
 max_seq_length=50
 global_seq_length=16
@@ -7,7 +8,7 @@ max_predictions_per_seq=30
 masked_lm_prob=0.6
 
 dim=64
-batch_size=32
+batch_size=128
 num_train_steps=1000
 
 mask_prob=1.0
@@ -32,10 +33,10 @@ signature="-mp${mask_prob}-sw${prop_sliding_window}-mlp${masked_lm_prob}-df${dup
 
 
 CUDA_VISIBLE_DEVICES=1 python -u run.py \
-    --train_input_file=./data/${dataset_name}${signature}.train.tfrecord \
-    --test_input_file=./data/${dataset_name}${signature}.test.tfrecord \
-    --vocab_filename=./data/${dataset_name}${signature}.vocab \
-    --user_history_filename=./data/${dataset_name}${signature}.his \
+    --train_input_file=${DATA_DIR}/${dataset_name}${signature}.train.tfrecord \
+    --test_input_file=${DATA_DIR}/${dataset_name}${signature}.test.tfrecord \
+    --vocab_filename=${DATA_DIR}/${dataset_name}${signature}.vocab \
+    --user_history_filename=${DATA_DIR}/${dataset_name}${signature}.his \
     --checkpointDir=${CKPT_DIR}/${dataset_name} \
     --signature=${signature}-${dim} \
     --do_train=True \
