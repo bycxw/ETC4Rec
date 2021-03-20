@@ -165,8 +165,8 @@ class EvalHooks(tf.train.SessionRunHook):
             self.probability = [value / sum_value for value in values]
 
     def end(self, session):
-        print(
-            "ndcg@1:{}, hit@1:{}， ndcg@5:{}, hit@5:{}, ndcg@10:{}, hit@10:{}, ap:{}, valid_user:{}".
+        print("---------------------------------\n" +
+            "ndcg@1:{},\nhit@1:{}，\nndcg@5:{},\nhit@5:{},\nndcg@10:{},\nhit@10:{}, \nap:{}, \nvalid_user:{}".
             format(self.ndcg_1 / self.valid_user, self.hit_1 / self.valid_user,
                    self.ndcg_5 / self.valid_user, self.hit_5 / self.valid_user,
                    self.ndcg_10 / self.valid_user,
