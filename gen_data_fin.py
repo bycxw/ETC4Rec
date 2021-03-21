@@ -35,7 +35,7 @@ flags.DEFINE_integer(
     "max sequence length.")
 
 flags.DEFINE_integer(
-    "global_seq_length", 16,
+    "global_seq_length", 0,
     "global sequence length")
 
 flags.DEFINE_integer(
