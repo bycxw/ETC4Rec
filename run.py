@@ -69,7 +69,7 @@ flags.DEFINE_integer(
     "than this will be padded. Must match data generation.")
 
 flags.DEFINE_integer(
-    "global_seq_length", 16,
+    "global_seq_length", 8,
     "Global sequence length")
 
 flags.DEFINE_integer("max_predictions_per_seq", 20,
