@@ -44,3 +44,5 @@ CUDA_VISIBLE_DEVICES=0 python -u run.py \
     --num_warmup_steps=100 \
     --learning_rate=1e-4
 
+sleep 300
+sh ../shutdown.sh

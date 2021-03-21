@@ -7,7 +7,7 @@ masked_lm_prob=0.6
 
 dim=64
 batch_size=256
-num_train_steps=100000
+num_train_steps=400000
 
 mask_prob=1.0
 prop_sliding_window=0.1
@@ -46,3 +46,6 @@ CUDA_VISIBLE_DEVICES=1 python -u run.py \
     --num_train_steps=${num_train_steps} \
     --num_warmup_steps=100 \
     --learning_rate=1e-4
+
+sleep 300
+sh ../shutdown.sh
