@@ -28,6 +28,12 @@ import sys
 import pickle
 tf.enable_eager_execution()
 os.environ["CUDA_VISIBLE_DEVICES"]="0"
+
+gpus = tf.config.experimental.list_physical_devices(device_type='GPU')
+for gpu in gpus:
+    tf.config.experimental.set_memory_growth(gpu, True)
+
+
 flags = tf.flags
 FLAGS = flags.FLAGS
 
