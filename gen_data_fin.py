@@ -529,7 +529,7 @@ def main():
         print(os.getcwd())
         exit(1)
 
-    dataset = data_partition(output_dir+dataset_name+'.txt')
+    dataset = data_partition(os.path.join(output_dir,dataset_name+'.txt'))
     [user_train, user_valid, user_test, usernum, itemnum] = dataset
     cc = 0.0
     max_len = 0
