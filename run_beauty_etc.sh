@@ -11,7 +11,7 @@ masked_lm_prob=0.6
 
 dim=64
 batch_size=256
-num_train_steps=10000
+num_train_steps=100000
 
 mask_prob=1.0
 prop_sliding_window=0.1
