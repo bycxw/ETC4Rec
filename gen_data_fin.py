@@ -577,7 +577,7 @@ def main():
     }
 
     print('begin to generate train')
-    output_filename = output_dir + dataset_name + version_id + '.train.tfrecord'
+    output_filename = os.path.join(output_dir, dataset_name + version_id + '.train.tfrecord')
     gen_samples(
         user_train_data,
         output_filename,
@@ -596,7 +596,7 @@ def main():
     print('train:{}'.format(output_filename))
 
     print('begin to generate test')
-    output_filename = output_dir + dataset_name + version_id + '.test.tfrecord'
+    output_filename = os.path.join(output_dir, dataset_name + version_id + '.test.tfrecord')
     gen_samples(
         user_test_data,
         output_filename,
@@ -619,12 +619,12 @@ def main():
                  vocab.get_user_count(),
                  vocab.get_item_count(),
                  vocab.get_item_count() + vocab.get_special_token_count()))
-    vocab_file_name = output_dir + dataset_name + version_id + '.vocab'
+    vocab_file_name = os.path.join(output_dir, dataset_name + version_id + '.vocab')
     print('vocab pickle file: ' + vocab_file_name)
     with open(vocab_file_name, 'wb') as output_file:
         pickle.dump(vocab, output_file, protocol=2)
 
-    his_file_name = output_dir + dataset_name + version_id + '.his'
+    his_file_name = os.path.join(output_dir, dataset_name + version_id + '.his')
     print('test data pickle file: ' + his_file_name)
     with open(his_file_name, 'wb') as output_file:
         pickle.dump(user_test_data_output, output_file, protocol=2)
