@@ -16,8 +16,7 @@ mask_prob=1.0
 dupe_factor=10
 pool_size=10
 
-signature="-mp${mask_prob}-sw${prop_sliding_window}-mlp${masked_lm_prob}-df${dupe_factor}- \
-           mpps${max_predictions_per_seq}-msl${max_seq_length}-gsl${global_seq_length}-lra${local_radius}"
+signature="-mp${mask_prob}-sw${prop_sliding_window}-mlp${masked_lm_prob}-df${dupe_factor}-mpps${max_predictions_per_seq}-msl${max_seq_length}-gsl${global_seq_length}-lra${local_radius}"
 
 python -u gen_data_fin.py \
     --dataset_name=${dataset_name} \
