@@ -47,6 +47,7 @@ CUDA_VISIBLE_DEVICES=1 python -u run.py \
     --model_config_file=./train_config/etc_config_${dataset_name}_${dim}.json \
     --batch_size=${batch_size} \
     --max_seq_length=${max_seq_length} \
+    --global_seq_length=${global_seq_length} \
     --max_predictions_per_seq=${max_predictions_per_seq} \
     --num_train_steps=${num_train_steps} \
     --num_warmup_steps=100 \
