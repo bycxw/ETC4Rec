@@ -3,7 +3,7 @@ DATA_DIR="/home/mist/data"
 dataset_name="beauty"
 max_seq_length=50
 global_seq_length=8
-local_radius=16
+local_radius=49
 max_predictions_per_seq=30
 masked_lm_prob=0.6
 
