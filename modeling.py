@@ -185,34 +185,16 @@ class EtcConfig(ModelConfig):
         self.grad_checkpointing_period = grad_checkpointing_period
 
 
-class EtcModel(object):
+class EtcModel(tf.keras.layers.Layer):
     """ETC model."""
 
     def __init__(self,
-                 config: EtcConfig,
-                 token_ids: tf.Tensor,
-                 global_token_ids: tf.Tensor,
-                 is_training: Optional[bool] = None,
-                 use_one_hot_embeddings=False,
-                 use_one_hot_relative_embeddings=False,
-                 name: Text = "etc_document_bert",
-                 segment_ids: Optional[tf.Tensor] = None,
-                 global_segment_ids: Optional[tf.Tensor] = None,
-                 position_ids: Optional[tf.Tensor] = None,
-                 global_position_ids: Optional[tf.Tensor] = None,
-                 l2l_att_mask: Optional[tf.Tensor] = None,
-                 g2g_att_mask: Optional[tf.Tensor] = None,
-                 l2g_att_mask: Optional[tf.Tensor] = None,
-                 g2l_att_mask: Optional[tf.Tensor] = None,
-                 l2l_relative_att_ids: Optional[tf.Tensor] = None,
-                 g2g_relative_att_ids: Optional[tf.Tensor] = None,
-                 l2g_relative_att_ids: Optional[tf.Tensor] = None,
-                 g2l_relative_att_ids: Optional[tf.Tensor] = None,
-                 long_embedding_adder: Optional[tf.Tensor] = None,
-                 global_embedding_adder: Optional[tf.Tensor] = None,
-                 training=None,
-                 scope=None,
-                 **kwargs):
+               config: EtcConfig,
+               is_training: Optional[bool] = None,
+               use_one_hot_embeddings=False,
+               use_one_hot_relative_embeddings=False,
+               name: Text = "etc_document_bert",
+               **kwargs):
         """Constructor for `EtcModel`.
 
         Args:
@@ -228,6 +210,132 @@ class EtcModel(object):
             embeddings.
           name: (Optional) name of the layer.
           **kwargs: Forwarded to super.
+
+        Raises:
+              ValueError: The config is invalid.
+            """
+        super(EtcModel, self).__init__(name=name, **kwargs)
+
+        config = copy.deepcopy(config)
+        if is_training is not None and not is_training:
+          config.hidden_dropout_prob = 0.0
+          config.attention_probs_dropout_prob = 0.0
+
+        self.config = config
+        self.is_training = is_training
+        self.use_one_hot_embeddings = use_one_hot_embeddings
+        self.use_one_hot_relative_embeddings = use_one_hot_relative_embeddings
+
+        if config.relative_vocab_size is None:
+          if config.relative_pos_max_distance != 0:
+            raise ValueError(
+                "`relative_pos_max_distance` must be 0 when `relative_vocab_size` "
+                "is None.")
+        elif config.relative_vocab_size < (feature_utils.RelativePositionGenerator(
+            config.relative_pos_max_distance).relative_vocab_size +
+                                           _NUM_OTHER_RELATIVE_IDS):
+          raise ValueError("`relative_vocab_size` ({}) too small for "
+                           "`relative_pos_max_distance` ({})".format(
+                               config.relative_vocab_size,
+                               config.relative_pos_max_distance))
+        if config.embedding_size is None:
+          config.embedding_size = config.hidden_size
+
+        self.token_embedding = etc_layers.EmbeddingLookup(
+            vocab_size=config.vocab_size,
+            embedding_size=config.embedding_size,
+            projection_size=config.hidden_size,
+            initializer_range=config.initializer_range,
+            use_one_hot_lookup=use_one_hot_embeddings,
+            name="token_emb_lookup")
+
+        self.token_embedding_norm = tf.keras.layers.LayerNormalization(
+            axis=-1, epsilon=1e-12, name="long_emb_layer_norm")
+        self.token_embedding_dropout = tf.keras.layers.Dropout(
+            rate=config.hidden_dropout_prob)
+
+        self.segment_embedding = etc_layers.EmbeddingLookup(
+            vocab_size=config.segment_vocab_size,
+            embedding_size=config.hidden_size,
+            initializer_range=config.initializer_range,
+            use_one_hot_lookup=True,
+            name="segment_emb_lookup")
+
+        if config.max_absolute_position_embeddings != 0:
+          self.position_embedding = etc_layers.EmbeddingLookup(
+              vocab_size=config.max_absolute_position_embeddings,
+              embedding_size=config.hidden_size,
+              initializer_range=config.initializer_range,
+              use_one_hot_lookup=use_one_hot_embeddings,
+              name="position_emb_lookup_long")
+          # We use `max_absolute_position_embeddings` for the maximum global input
+          # length even though it's larger than we need. This makes it easier to
+          # initialize both long and global position embedding tables with the same
+          # values if desired.
+          self.global_position_embedding = etc_layers.EmbeddingLookup(
+              vocab_size=config.max_absolute_position_embeddings,
+              embedding_size=config.hidden_size,
+              initializer_range=config.initializer_range,
+              use_one_hot_lookup=use_one_hot_embeddings,
+              name="position_emb_lookup_global")
+          # Call layers to force variable initialization.
+          self.position_embedding(tf.ones([1, 1], tf.int32))
+          self.global_position_embedding(tf.ones([1, 1], tf.int32))
+        else:
+          self.position_embedding = None
+          self.global_position_embedding = None
+
+        # We use the same embedding table for global tokens to make it easy to place
+        # WordPieces in the global memory for finetuning tasks downstream.
+        self.global_token_embedding = self.token_embedding
+        self.global_token_embedding_norm = tf.keras.layers.LayerNormalization(
+            axis=-1, epsilon=1e-12, name="global_emb_layer_norm")
+        self.global_token_embedding_dropout = tf.keras.layers.Dropout(
+            rate=config.hidden_dropout_prob)
+
+        self.global_local_transformer = etc_layers.GlobalLocalTransformerLayers(
+            long_hidden_size=config.hidden_size,
+            global_hidden_size=config.hidden_size,
+            num_hidden_layers=config.num_hidden_layers,
+            num_attention_heads=config.num_attention_heads,
+            local_radius=config.local_radius,
+            att_size_per_head=config.att_size_per_head,
+            long_intermediate_size=config.intermediate_size,
+            global_intermediate_size=config.intermediate_size,
+            hidden_act=tensor_utils.get_activation(config.hidden_act),
+            hidden_dropout_prob=config.hidden_dropout_prob,
+            attention_probs_dropout_prob=config.attention_probs_dropout_prob,
+            initializer_range=config.initializer_range,
+            relative_vocab_size=config.relative_vocab_size,
+            share_feed_forward_params=config.share_feed_forward_params,
+            share_kv_projections=config.share_kv_projections,
+            share_qkv_projections=config.share_qkv_projections,
+            share_att_output_projection=config.share_att_output_projection,
+            use_pre_activation_order=config.use_pre_activation_order,
+            use_one_hot_lookup=use_one_hot_relative_embeddings,
+            grad_checkpointing_period=config.grad_checkpointing_period)
+
+    def call(self,
+            token_ids: tf.Tensor,
+            global_token_ids: tf.Tensor,
+            segment_ids: Optional[tf.Tensor] = None,
+            global_segment_ids: Optional[tf.Tensor] = None,
+            position_ids: Optional[tf.Tensor] = None,
+            global_position_ids: Optional[tf.Tensor] = None,
+            l2l_att_mask: Optional[tf.Tensor] = None,
+            g2g_att_mask: Optional[tf.Tensor] = None,
+            l2g_att_mask: Optional[tf.Tensor] = None,
+            g2l_att_mask: Optional[tf.Tensor] = None,
+            l2l_relative_att_ids: Optional[tf.Tensor] = None,
+            g2g_relative_att_ids: Optional[tf.Tensor] = None,
+            l2g_relative_att_ids: Optional[tf.Tensor] = None,
+            g2l_relative_att_ids: Optional[tf.Tensor] = None,
+            long_embedding_adder: Optional[tf.Tensor] = None,
+            global_embedding_adder: Optional[tf.Tensor] = None,
+            training=None):
+        """Calls the layer.
+
+        Args:
           token_ids: <int32>[batch_size, long_seq_len] Tensor of token ids.
           global_token_ids: <int32>[batch_size, global_seq_len] Tensor of global
             token ids.
@@ -264,94 +372,11 @@ class EtcModel(object):
             indicating whether the call is meant for training or inference. Must
             be None if `is_training` was not None in `__init__`.
 
-        Raises:
-          ValueError: The config is invalid.
-
         Returns:
           A list of Tensors, [long_output, global_output]:
             long_output: <float32>[batch_size, long_seq_len, hidden_size]
             global_output: <float32>[batch_size, global_seq_len, hidden_size]
         """
-
-        config = copy.deepcopy(config)
-        if is_training is not None and not is_training:
-            config.hidden_dropout_prob = 0.0
-            config.attention_probs_dropout_prob = 0.0
-
-        self.config = config
-        self.is_training = is_training
-        self.use_one_hot_embeddings = use_one_hot_embeddings
-        self.use_one_hot_relative_embeddings = use_one_hot_relative_embeddings
-
-        if config.relative_vocab_size is None:
-            if config.relative_pos_max_distance != 0:
-                raise ValueError(
-                    "`relative_pos_max_distance` must be 0 when `relative_vocab_size` "
-                    "is None.")
-        elif config.relative_vocab_size < (feature_utils.RelativePositionGenerator(
-            config.relative_pos_max_distance).relative_vocab_size +
-                                           _NUM_OTHER_RELATIVE_IDS):
-            raise ValueError("`relative_vocab_size` ({}) too small for "
-                             "`relative_pos_max_distance` ({})".format(
-                               config.relative_vocab_size,
-                               config.relative_pos_max_distance))
-        if config.embedding_size is None:
-            config.embedding_size = config.hidden_size
-
-
-        self.token_embedding = etc_layers.EmbeddingLookup(
-            vocab_size=config.vocab_size,
-            embedding_size=config.embedding_size,
-            projection_size=config.hidden_size,
-            initializer_range=config.initializer_range,
-            use_one_hot_lookup=use_one_hot_embeddings,
-            name="token_emb_lookup")
-        self.token_embedding.build()
-        self.embedding_table = self.token_embedding.get_embedding_table()
-        self.token_embedding_norm = tf.keras.layers.LayerNormalization(
-            axis=-1, epsilon=1e-12, name="long_emb_layer_norm")
-        self.token_embedding_dropout = tf.keras.layers.Dropout(
-            rate=config.hidden_dropout_prob)
-
-        self.segment_embedding = etc_layers.EmbeddingLookup(
-            vocab_size=config.segment_vocab_size,
-            embedding_size=config.hidden_size,
-            initializer_range=config.initializer_range,
-            use_one_hot_lookup=True,
-            name="segment_emb_lookup")
-
-        if config.max_absolute_position_embeddings != 0:
-            self.position_embedding = etc_layers.EmbeddingLookup(
-                vocab_size=config.max_absolute_position_embeddings,
-                embedding_size=config.hidden_size,
-                initializer_range=config.initializer_range,
-                use_one_hot_lookup=use_one_hot_embeddings,
-                name="position_emb_lookup_long")
-            # We use `max_absolute_position_embeddings` for the maximum global input
-            # length even though it's larger than we need. This makes it easier to
-            # initialize both long and global position embedding tables with the same
-            # values if desired.
-            self.global_position_embedding = etc_layers.EmbeddingLookup(
-                vocab_size=config.max_absolute_position_embeddings,
-                embedding_size=config.hidden_size,
-                initializer_range=config.initializer_range,
-                use_one_hot_lookup=use_one_hot_embeddings,
-                name="position_emb_lookup_global")
-            # Call layers to force variable initialization.
-            self.position_embedding(tf.ones([1, 1], tf.int32))
-            self.global_position_embedding(tf.ones([1, 1], tf.int32))
-        else:
-            self.position_embedding = None
-            self.global_position_embedding = None
-
-        # We use the same embedding table for global tokens to make it easy to place
-        # WordPieces in the global memory for finetuning tasks downstream.
-        self.global_token_embedding = self.token_embedding
-        self.global_token_embedding_norm = tf.keras.layers.LayerNormalization(
-            axis=-1, epsilon=1e-12, name="global_emb_layer_norm")
-        self.global_token_embedding_dropout = tf.keras.layers.Dropout(
-            rate=config.hidden_dropout_prob)
-
         if self.is_training is not None:
           if training is not None:
             raise ValueError(
@@ -382,7 +407,6 @@ class EtcModel(object):
           long_input += long_embedding_adder
         long_input = self.token_embedding_norm(long_input)
         long_input = self.token_embedding_dropout(long_input, training=training)
-        self.long_input = long_input
 
         global_input = self.global_token_embedding(global_token_ids)
         global_input += self.segment_embedding(global_segment_ids)
@@ -398,50 +422,22 @@ class EtcModel(object):
         global_input = self.global_token_embedding_dropout(
             global_input, training=training)
 
-        self.global_local_transformer = etc_layers.GlobalLocalTransformerLayers(
-            long_hidden_size=config.hidden_size,
-            global_hidden_size=config.hidden_size,
-            num_hidden_layers=config.num_hidden_layers,
-            num_attention_heads=config.num_attention_heads,
-            local_radius=config.local_radius,
-            att_size_per_head=config.att_size_per_head,
-            long_intermediate_size=config.intermediate_size,
-            global_intermediate_size=config.intermediate_size,
-            hidden_act=tensor_utils.get_activation(config.hidden_act),
-            hidden_dropout_prob=config.hidden_dropout_prob,
-            attention_probs_dropout_prob=config.attention_probs_dropout_prob,
-            initializer_range=config.initializer_range,
-            relative_vocab_size=config.relative_vocab_size,
-            share_feed_forward_params=config.share_feed_forward_params,
-            share_kv_projections=config.share_kv_projections,
-            share_qkv_projections=config.share_qkv_projections,
-            share_att_output_projection=config.share_att_output_projection,
-            use_pre_activation_order=config.use_pre_activation_order,
-            use_one_hot_lookup=use_one_hot_relative_embeddings,
-            grad_checkpointing_period=config.grad_checkpointing_period)
+        self.long_input, self.global_input = long_input, global_input
 
         self.long_output, self.global_output = self.global_local_transformer(
-            long_input=long_input,
-            global_input=global_input,
-            l2l_att_mask=l2l_att_mask,
-            g2g_att_mask=g2g_att_mask,
-            l2g_att_mask=l2g_att_mask,
-            g2l_att_mask=g2l_att_mask,
-            l2l_relative_att_ids=l2l_relative_att_ids,
-            g2g_relative_att_ids=g2g_relative_att_ids,
-            l2g_relative_att_ids=l2g_relative_att_ids,
-            g2l_relative_att_ids=g2l_relative_att_ids,
-            training=training)
+                                                                        long_input=long_input,
+                                                                        global_input=global_input,
+                                                                        l2l_att_mask=l2l_att_mask,
+                                                                        g2g_att_mask=g2g_att_mask,
+                                                                        l2g_att_mask=l2g_att_mask,
+                                                                        g2l_att_mask=g2l_att_mask,
+                                                                        l2l_relative_att_ids=l2l_relative_att_ids,
+                                                                        g2g_relative_att_ids=g2g_relative_att_ids,
+                                                                        l2g_relative_att_ids=l2g_relative_att_ids,
+                                                                        g2l_relative_att_ids=g2l_relative_att_ids,
+                                                                        training=training)
 
-        self.long_output, self.global_output = long_input, global_input
-
-    def get_token_embedding_table(self):
-        """Returns the token embedding table, but only if the model is built."""
-        if not hasattr(self.token_embedding, "embedding_table"):
-            raise ValueError(
-                "Cannot call `get_token_embedding_table()` until the model has been "
-                "called so that all variables are built.")
-        return self.token_embedding.embedding_table
+        return self.long_output
 
     def get_sequence_output(self):
         """Gets final hidden layer of encoder.
@@ -464,7 +460,289 @@ class EtcModel(object):
         return self.long_input
 
     def get_embedding_table(self):
-        return self.embedding_table
+        return self.token_embedding.get_embedding_table()
+
+
+# class EtcModel(object):
+#     """ETC model."""
+#
+#     def __init__(self,
+#                  config: EtcConfig,
+#                  token_ids: tf.Tensor,
+#                  global_token_ids: tf.Tensor,
+#                  is_training: Optional[bool] = None,
+#                  use_one_hot_embeddings=False,
+#                  use_one_hot_relative_embeddings=False,
+#                  name: Text = "etc_document_bert",
+#                  segment_ids: Optional[tf.Tensor] = None,
+#                  global_segment_ids: Optional[tf.Tensor] = None,
+#                  position_ids: Optional[tf.Tensor] = None,
+#                  global_position_ids: Optional[tf.Tensor] = None,
+#                  l2l_att_mask: Optional[tf.Tensor] = None,
+#                  g2g_att_mask: Optional[tf.Tensor] = None,
+#                  l2g_att_mask: Optional[tf.Tensor] = None,
+#                  g2l_att_mask: Optional[tf.Tensor] = None,
+#                  l2l_relative_att_ids: Optional[tf.Tensor] = None,
+#                  g2g_relative_att_ids: Optional[tf.Tensor] = None,
+#                  l2g_relative_att_ids: Optional[tf.Tensor] = None,
+#                  g2l_relative_att_ids: Optional[tf.Tensor] = None,
+#                  long_embedding_adder: Optional[tf.Tensor] = None,
+#                  global_embedding_adder: Optional[tf.Tensor] = None,
+#                  training=None,
+#                  scope=None,
+#                  **kwargs):
+#         """Constructor for `EtcModel`.
+#
+#         Args:
+#           config: `EtcConfig` instance.
+#           is_training: Optional bool. True for training model, False for eval model.
+#             The None default will defer to the typical Keras `training` argument in
+#             `call` instead. When `is_training` is specified here, the `training`
+#             argument from `call` must not be used.
+#           use_one_hot_embeddings: (optional) bool. Whether to use one-hot word
+#             embeddings or tf.nn.embedding_lookup() for the word embeddings.
+#           use_one_hot_relative_embeddings: (optional) bool. Whether to use one-hot
+#             word embeddings or tf.nn.embedding_lookup() for the relative position
+#             embeddings.
+#           name: (Optional) name of the layer.
+#           **kwargs: Forwarded to super.
+#           token_ids: <int32>[batch_size, long_seq_len] Tensor of token ids.
+#           global_token_ids: <int32>[batch_size, global_seq_len] Tensor of global
+#             token ids.
+#           segment_ids: <int32>[batch_size, long_seq_len] Optional Tensor of segment
+#             ids. By default we just fill all elements with segment id 1.
+#           global_segment_ids: <int32>[batch_size, global_seq_len] Optional Tensor of
+#             global segment ids. By default we just fill all elements with segment id
+#             0. This is deliberately different from the `segment_ids` default of 1
+#             so that we distinguish between global vs. long segments.
+#           position_ids: <int32>[batch_size, long_seq_len] Optional Tensor of
+#             absolute position ids. By default we use `tf.range(long_seq_len)` if
+#             `max_absolute_position_embeddings` is nonzero. The maximum position id
+#             must not be larger than `max_absolute_position_embeddings`.
+#           global_position_ids: <int32>[batch_size, global_seq_len] Optional Tensor
+#             of absolute position ids. By default we use `tf.range(global_seq_len)`
+#             if `max_absolute_position_embeddings` is nonzero. The maximum position
+#             id must not be larger than `max_absolute_position_embeddings`. Note that
+#             global and long absolute position embeddings are separate variables.
+#           l2l_att_mask: <int32>[batch_size, long_seq_len,  2*local_radius + 1]
+#           g2g_att_mask: <int32>[batch_size, global_seq_len, global_seq_len]
+#           l2g_att_mask: <int32>[batch_size, long_seq_len, global_seq_len]
+#           g2l_att_mask: <int32>[batch_size, global_seq_len, long_seq_len]
+#           l2l_relative_att_ids: <int32>[batch_size, long_seq_len, 2*local_radius+1]
+#           g2g_relative_att_ids: <int32>[batch_size, global_seq_len, global_seq_len]
+#           l2g_relative_att_ids: <int32>[batch_size, long_seq_len, global_seq_len]
+#           g2l_relative_att_ids: <int32>[batch_size, global_seq_len, long_seq_len]
+#           long_embedding_adder: <float32>[batch_size, long_seq_len, hidden_size]
+#             Tensor of additional values to add to the long input embedding before
+#             layer normalization of the embeddings. By default this is skipped.
+#           global_embedding_adder: <float32>[batch_size, global_seq_len, hidden_size]
+#             Tensor of additional values to add to the glboal input embedding before
+#             layer normalization of the embeddings. By default this is skipped.
+#           training: For Keras, optional boolean scalar tensor or Python boolean
+#             indicating whether the call is meant for training or inference. Must
+#             be None if `is_training` was not None in `__init__`.
+#
+#         Raises:
+#           ValueError: The config is invalid.
+#
+#         Returns:
+#           A list of Tensors, [long_output, global_output]:
+#             long_output: <float32>[batch_size, long_seq_len, hidden_size]
+#             global_output: <float32>[batch_size, global_seq_len, hidden_size]
+#         """
+#
+#         config = copy.deepcopy(config)
+#         if is_training is not None and not is_training:
+#             config.hidden_dropout_prob = 0.0
+#             config.attention_probs_dropout_prob = 0.0
+#
+#         self.config = config
+#         self.is_training = is_training
+#         self.use_one_hot_embeddings = use_one_hot_embeddings
+#         self.use_one_hot_relative_embeddings = use_one_hot_relative_embeddings
+#
+#         if config.relative_vocab_size is None:
+#             if config.relative_pos_max_distance != 0:
+#                 raise ValueError(
+#                     "`relative_pos_max_distance` must be 0 when `relative_vocab_size` "
+#                     "is None.")
+#         elif config.relative_vocab_size < (feature_utils.RelativePositionGenerator(
+#             config.relative_pos_max_distance).relative_vocab_size +
+#                                            _NUM_OTHER_RELATIVE_IDS):
+#             raise ValueError("`relative_vocab_size` ({}) too small for "
+#                              "`relative_pos_max_distance` ({})".format(
+#                                config.relative_vocab_size,
+#                                config.relative_pos_max_distance))
+#         if config.embedding_size is None:
+#             config.embedding_size = config.hidden_size
+#
+#
+#         self.token_embedding = etc_layers.EmbeddingLookup(
+#             vocab_size=config.vocab_size,
+#             embedding_size=config.embedding_size,
+#             projection_size=config.hidden_size,
+#             initializer_range=config.initializer_range,
+#             use_one_hot_lookup=use_one_hot_embeddings,
+#             name="token_emb_lookup")
+#         self.token_embedding.build()
+#         self.embedding_table = self.token_embedding.get_embedding_table()
+#         self.token_embedding_norm = tf.keras.layers.LayerNormalization(
+#             axis=-1, epsilon=1e-12, name="long_emb_layer_norm")
+#         self.token_embedding_dropout = tf.keras.layers.Dropout(
+#             rate=config.hidden_dropout_prob)
+#
+#         self.segment_embedding = etc_layers.EmbeddingLookup(
+#             vocab_size=config.segment_vocab_size,
+#             embedding_size=config.hidden_size,
+#             initializer_range=config.initializer_range,
+#             use_one_hot_lookup=True,
+#             name="segment_emb_lookup")
+#
+#         if config.max_absolute_position_embeddings != 0:
+#             self.position_embedding = etc_layers.EmbeddingLookup(
+#                 vocab_size=config.max_absolute_position_embeddings,
+#                 embedding_size=config.hidden_size,
+#                 initializer_range=config.initializer_range,
+#                 use_one_hot_lookup=use_one_hot_embeddings,
+#                 name="position_emb_lookup_long")
+#             # We use `max_absolute_position_embeddings` for the maximum global input
+#             # length even though it's larger than we need. This makes it easier to
+#             # initialize both long and global position embedding tables with the same
+#             # values if desired.
+#             self.global_position_embedding = etc_layers.EmbeddingLookup(
+#                 vocab_size=config.max_absolute_position_embeddings,
+#                 embedding_size=config.hidden_size,
+#                 initializer_range=config.initializer_range,
+#                 use_one_hot_lookup=use_one_hot_embeddings,
+#                 name="position_emb_lookup_global")
+#             # Call layers to force variable initialization.
+#             self.position_embedding(tf.ones([1, 1], tf.int32))
+#             self.global_position_embedding(tf.ones([1, 1], tf.int32))
+#         else:
+#             self.position_embedding = None
+#             self.global_position_embedding = None
+#
+#         # We use the same embedding table for global tokens to make it easy to place
+#         # WordPieces in the global memory for finetuning tasks downstream.
+#         self.global_token_embedding = self.token_embedding
+#         self.global_token_embedding_norm = tf.keras.layers.LayerNormalization(
+#             axis=-1, epsilon=1e-12, name="global_emb_layer_norm")
+#         self.global_token_embedding_dropout = tf.keras.layers.Dropout(
+#             rate=config.hidden_dropout_prob)
+#
+#         if self.is_training is not None:
+#           if training is not None:
+#             raise ValueError(
+#                 "`training` must be None when `is_training` is given in `__init__`."
+#             )
+#           training = self.is_training
+#
+#         if segment_ids is None:
+#           segment_ids = tf.ones_like(token_ids)
+#         if global_segment_ids is None:
+#           global_segment_ids = tf.zeros_like(global_token_ids)
+#
+#         if self.config.max_absolute_position_embeddings == 0 and (
+#             position_ids is not None or global_position_ids is not None):
+#           raise ValueError(
+#               "Cannot specify `position_ids` or `global_position_ids` arguments "
+#               "when `max_absolute_position_embeddings` is 0.")
+#
+#         long_input = self.token_embedding(token_ids)
+#         long_input += self.segment_embedding(segment_ids)
+#         if self.position_embedding is not None:
+#           if position_ids is None:
+#             long_input += self.position_embedding.embedding_table[
+#                 tf.newaxis, :long_input.shape[1], :]
+#           else:
+#             long_input += self.position_embedding(position_ids)
+#         if long_embedding_adder is not None:
+#           long_input += long_embedding_adder
+#         long_input = self.token_embedding_norm(long_input)
+#         long_input = self.token_embedding_dropout(long_input, training=training)
+#         self.long_input = long_input
+#
+#         global_input = self.global_token_embedding(global_token_ids)
+#         global_input += self.segment_embedding(global_segment_ids)
+#         if self.global_position_embedding is not None:
+#           if global_position_ids is None:
+#             global_input += self.global_position_embedding.embedding_table[
+#                 tf.newaxis, :global_input.shape[1], :]
+#           else:
+#             global_input += self.global_position_embedding(global_position_ids)
+#         if global_embedding_adder is not None:
+#           global_input += global_embedding_adder
+#         global_input = self.global_token_embedding_norm(global_input)
+#         global_input = self.global_token_embedding_dropout(
+#             global_input, training=training)
+#
+#         self.global_local_transformer = etc_layers.GlobalLocalTransformerLayers(
+#             long_hidden_size=config.hidden_size,
+#             global_hidden_size=config.hidden_size,
+#             num_hidden_layers=config.num_hidden_layers,
+#             num_attention_heads=config.num_attention_heads,
+#             local_radius=config.local_radius,
+#             att_size_per_head=config.att_size_per_head,
+#             long_intermediate_size=config.intermediate_size,
+#             global_intermediate_size=config.intermediate_size,
+#             hidden_act=tensor_utils.get_activation(config.hidden_act),
+#             hidden_dropout_prob=config.hidden_dropout_prob,
+#             attention_probs_dropout_prob=config.attention_probs_dropout_prob,
+#             initializer_range=config.initializer_range,
+#             relative_vocab_size=config.relative_vocab_size,
+#             share_feed_forward_params=config.share_feed_forward_params,
+#             share_kv_projections=config.share_kv_projections,
+#             share_qkv_projections=config.share_qkv_projections,
+#             share_att_output_projection=config.share_att_output_projection,
+#             use_pre_activation_order=config.use_pre_activation_order,
+#             use_one_hot_lookup=use_one_hot_relative_embeddings,
+#             grad_checkpointing_period=config.grad_checkpointing_period)
+#
+#         self.long_output, self.global_output = self.global_local_transformer(
+#             long_input=long_input,
+#             global_input=global_input,
+#             l2l_att_mask=l2l_att_mask,
+#             g2g_att_mask=g2g_att_mask,
+#             l2g_att_mask=l2g_att_mask,
+#             g2l_att_mask=g2l_att_mask,
+#             l2l_relative_att_ids=l2l_relative_att_ids,
+#             g2g_relative_att_ids=g2g_relative_att_ids,
+#             l2g_relative_att_ids=l2g_relative_att_ids,
+#             g2l_relative_att_ids=g2l_relative_att_ids,
+#             training=training)
+#
+#         self.long_output, self.global_output = long_input, global_input
+#
+#     def get_token_embedding_table(self):
+#         """Returns the token embedding table, but only if the model is built."""
+#         if not hasattr(self.token_embedding, "embedding_table"):
+#             raise ValueError(
+#                 "Cannot call `get_token_embedding_table()` until the model has been "
+#                 "called so that all variables are built.")
+#         return self.token_embedding.embedding_table
+#
+#     def get_sequence_output(self):
+#         """Gets final hidden layer of encoder.
+#
+#         Returns:
+#         float Tensor of shape [batch_size, seq_length, hidden_size] corresponding
+#         to the final hidden of the transformer encoder.
+#         """
+#         return self.long_output
+#
+#     def get_embedding_output(self):
+#         """Gets output of the embedding lookup (i.e., input to the transformer).
+#
+#         Returns:
+#         float Tensor of shape [batch_size, seq_length, hidden_size] corresponding
+#         to the output of the embedding layer, after summing the word
+#         embeddings with the positional embeddings and the token type embeddings,
+#         then performing layer normalization. This is the input to the transformer.
+#         """
+#         return self.long_input
+#
+#     def get_embedding_table(self):
+#         return self.embedding_table
 
 
 class BertConfig(ModelConfig):
