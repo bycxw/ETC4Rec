@@ -8,7 +8,7 @@ local_radius=1
 max_predictions_per_seq=40
 
 dim=64
-batch_size=256
+batch_size=16
 num_train_steps=100000
 
 prop_sliding_window=0.5
