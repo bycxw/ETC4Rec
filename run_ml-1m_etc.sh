@@ -1,10 +1,10 @@
 CKPT_DIR="/home/mist/data/record"
 DATA_DIR="/home/mist/data"
 dataset_name="ml-1m"
-max_seq_length=200
+max_seq_length=600
 masked_lm_prob=0.2
 global_seq_length=8
-local_radius=16
+local_radius=32
 max_predictions_per_seq=40
 
 dim=64
@@ -48,6 +48,11 @@ CUDA_VISIBLE_DEVICES=0 python -u run.py \
     --num_train_steps=${num_train_steps} \
     --num_warmup_steps=100 \
     --learning_rate=1e-4
+
+
+mkdir /home/mist/cloud/${dataset_name}${signature}
+cp ${CKPT_DIR}/${dataset_name}${signature}/eval_results.txt /home/mist/cloud/${dataset_name}${signature}
+
 
 sleep 300
 sh ../shutdown.sh
