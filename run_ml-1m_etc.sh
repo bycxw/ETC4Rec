@@ -1,7 +1,7 @@
 CKPT_DIR="/home/mist/data/record"
 DATA_DIR="/home/mist/data"
 dataset_name="ml-1m"
-max_seq_length=1024
+max_seq_length=2048
 masked_lm_prob=0.2
 global_seq_length=1
 local_radius=1
@@ -51,7 +51,7 @@ CUDA_VISIBLE_DEVICES=0 python -u run.py \
 
 
 mkdir /home/mist/cloud/${dataset_name}${signature}
-cp ${CKPT_DIR}/${dataset_name}${signature}/eval_results.txt /home/mist/cloud/${dataset_name}${signature}
+cp ${CKPT_DIR}/${dataset_name}${signature}/eval_results.txt /home/mist/cloud/${dataset_name}${signature}-${dim}
 
 
 sleep 300

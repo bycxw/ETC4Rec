@@ -49,7 +49,7 @@ CUDA_VISIBLE_DEVICES=0 python -u run.py \
 
 
 mkdir /home/mist/cloud/${dataset_name}${signature}
-cp ${CKPT_DIR}/${dataset_name}${signature}/eval_results.txt /home/mist/cloud/${dataset_name}${signature}
+cp ${CKPT_DIR}/${dataset_name}${signature}/eval_results.txt /home/mist/cloud/${dataset_name}${signature}-${dim}
 
 
 sleep 300
