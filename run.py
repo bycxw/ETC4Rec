@@ -262,7 +262,10 @@ def model_fn_builder(model_config, init_checkpoint, learning_rate,
         masked_lm_weights = features["masked_lm_weights"]
 
         if model_config.name == "ETC":
-            global_input_ids = features["global_input_ids"]
+            if model_config.global_seq_length > 0:
+                global_input_ids = features["global_input_ids"]
+            else:
+                global_input_ids = None
 
         is_training = (mode == tf.estimator.ModeKeys.TRAIN)
 
