@@ -3,7 +3,7 @@ DATA_DIR="/home/mist/data"
 dataset_name="ml-1m"
 max_seq_length=200
 masked_lm_prob=0.2
-global_seq_length=0
+global_seq_length=1
 local_radius=1
 max_predictions_per_seq=40
 

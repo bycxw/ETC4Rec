@@ -262,7 +262,7 @@ class GlobalLocalTransformerLayers(tf.keras.layers.Layer):
              g2g_relative_att_ids: Optional[tf.Tensor] = None,
              l2g_relative_att_ids: Optional[tf.Tensor] = None,
              g2l_relative_att_ids: Optional[tf.Tensor] = None,
-             att_implementation: Text = 'auto',
+             att_implementation: Text = 'sparse',
              training=None,
              ) -> List[tf.Tensor]:
         """Calls the layer.
