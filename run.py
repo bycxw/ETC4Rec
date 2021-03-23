@@ -273,7 +273,7 @@ def model_fn_builder(model_config, init_checkpoint, learning_rate,
                 use_one_hot_embeddings=use_one_hot_embeddings,
             )
             model(token_ids=input_ids,
-                global_token_ids=global_input_ids)
+                  global_token_ids=global_input_ids)
         else:  # Bert Model
             model = modeling.BertModel(
                 config=model_config,

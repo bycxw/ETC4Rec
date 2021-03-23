@@ -1,14 +1,14 @@
 CKPT_DIR="/home/mist/data/record"
 DATA_DIR="/home/mist/data"
 dataset_name="ml-1m"
-max_seq_length=200
+max_seq_length=600
 masked_lm_prob=0.2
-global_seq_length=1
-local_radius=1
+global_seq_length=8
+local_radius=32
 max_predictions_per_seq=40
 
 dim=64
-batch_size=16
+batch_size=256
 num_train_steps=100000
 
 prop_sliding_window=0.5

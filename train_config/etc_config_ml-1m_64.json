@@ -7,12 +7,13 @@
   "initializer_range": 0.02,
   "intermediate_size": 256,
   "max_absolute_position_embeddings": 0,
-  "global_seq_length": 1,
-  "local_radius": 1,
+  "global_seq_length": 8,
+  "local_radius": 32,
   "relative_pos_max_distance": 32,
   "relative_vocab_size": 68,
   "num_attention_heads": 2,
   "num_hidden_layers": 2,
   "segment_vocab_size": 2,
-  "vocab_size": 3676
+  "vocab_size": 3676,
+  "att_implementation": "sparse"
 }

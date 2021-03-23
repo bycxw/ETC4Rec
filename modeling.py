@@ -82,7 +82,8 @@ class EtcConfig(ModelConfig):
                  use_pre_activation_order=False,
                  use_hard_g2l_mask=False,
                  use_hard_l2g_mask=False,
-                 grad_checkpointing_period=0):
+                 grad_checkpointing_period=0,
+                 att_implementation: Text = 'auto'):
         """Constructs `EtcConfig`.
 
         Args:
@@ -183,6 +184,8 @@ class EtcConfig(ModelConfig):
         self.use_hard_g2l_mask = use_hard_g2l_mask
         self.use_hard_l2g_mask = use_hard_l2g_mask
         self.grad_checkpointing_period = grad_checkpointing_period
+        self.att_implementation = att_implementation
+
 
 
 class EtcModel(tf.keras.layers.Layer):
@@ -425,17 +428,18 @@ class EtcModel(tf.keras.layers.Layer):
         self.long_input, self.global_input = long_input, global_input
 
         self.long_output, self.global_output = self.global_local_transformer(
-                                                                        long_input=long_input,
-                                                                        global_input=global_input,
-                                                                        l2l_att_mask=l2l_att_mask,
-                                                                        g2g_att_mask=g2g_att_mask,
-                                                                        l2g_att_mask=l2g_att_mask,
-                                                                        g2l_att_mask=g2l_att_mask,
-                                                                        l2l_relative_att_ids=l2l_relative_att_ids,
-                                                                        g2g_relative_att_ids=g2g_relative_att_ids,
-                                                                        l2g_relative_att_ids=l2g_relative_att_ids,
-                                                                        g2l_relative_att_ids=g2l_relative_att_ids,
-                                                                        training=training)
+            long_input=long_input,
+            global_input=global_input,
+            l2l_att_mask=l2l_att_mask,
+            g2g_att_mask=g2g_att_mask,
+            l2g_att_mask=l2g_att_mask,
+            g2l_att_mask=g2l_att_mask,
+            l2l_relative_att_ids=l2l_relative_att_ids,
+            g2g_relative_att_ids=g2g_relative_att_ids,
+            l2g_relative_att_ids=l2g_relative_att_ids,
+            g2l_relative_att_ids=g2l_relative_att_ids,
+            att_implementation=self.config.att_implementation,
+            training=training)
 
         return self.long_output
 
