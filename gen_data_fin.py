@@ -529,7 +529,7 @@ def main():
         print(os.getcwd())
         exit(1)
 
-    dataset = data_partition(os.path.join(output_dir,dataset_name+'.txt'))
+    dataset = data_partition(os.path.join(output_dir, dataset_name+'.txt'))
     [user_train, user_valid, user_test, usernum, itemnum] = dataset
     cc = 0.0
     max_len = 0
@@ -548,7 +548,7 @@ def main():
         len(user_valid), len(user_test), usernum, itemnum))
 
     for idx, u in enumerate(user_train):
-        if idx < 10:
+        if idx < 2:
             print(user_train[u])
             print(user_valid[u])
             print(user_test[u])
