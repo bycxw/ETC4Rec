@@ -1,7 +1,7 @@
 CKPT_DIR="/home/mist/data/record"
 DATA_DIR="/home/mist/data"
 dataset_name="ml-1m"
-max_seq_length=2048
+max_seq_length=1024
 masked_lm_prob=0.2
 global_seq_length=1
 local_radius=1
@@ -54,5 +54,5 @@ mkdir /home/mist/cloud/${dataset_name}${signature}-${dim}
 cp ${CKPT_DIR}/${dataset_name}${signature}-${dim}/eval_results.txt /home/mist/cloud/${dataset_name}${signature}-${dim}
 
 
-sleep 300
-sh ../shutdown.sh
+#sleep 300
+#sh ../shutdown.sh
