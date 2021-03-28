@@ -654,13 +654,13 @@ def main():
     with open(vocab_file_name, 'wb') as output_file:
         pickle.dump(vocab, output_file, protocol=2)
 
-    his_file_name = os.path.join(output_dir, dataset_name + version_id + 'valid.his')
+    his_file_name = os.path.join(output_dir, dataset_name + version_id + '.valid.his')
     print('valid data pickle file: ' + his_file_name)
     with open(his_file_name, 'wb') as output_file:
         pickle.dump(user_valid_data_output, output_file, protocol=2)
     print('done.')
 
-    his_file_name = os.path.join(output_dir, dataset_name + version_id + 'test.his')
+    his_file_name = os.path.join(output_dir, dataset_name + version_id + '.test.his')
     print('test data pickle file: ' + his_file_name)
     with open(his_file_name, 'wb') as output_file:
         pickle.dump(user_test_data_output, output_file, protocol=2)
