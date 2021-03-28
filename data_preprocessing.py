@@ -99,7 +99,7 @@ def build_data(in_file_path: Path, out_file_path: Path, vocab: UserItemVocab):
             user_id, movie_id = vocab.convert_user_to_id(user), vocab.convert_item_to_id(movie)
             if not user_id or not movie_id:
                 continue
-            out_f.write("{},{}\n".format(user_id, movie_id))
+            out_f.write("{} {}\n".format(user_id, movie_id))
     print("Build data done.")
     print("data file: {}".format(out_file_path))
 

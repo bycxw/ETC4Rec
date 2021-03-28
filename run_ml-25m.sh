@@ -52,5 +52,5 @@ python -u gen_data_fin.py \
 #cp ${CKPT_DIR}/${dataset_name}${signature}-${dim}/eval_results.txt /home/mist/cloud/${dataset_name}${signature}-${dim}
 #
 #
-#sleep 300
-#sh ../shutdown.sh
+sleep 300
+sh ../shutdown.sh
