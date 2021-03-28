@@ -10,7 +10,7 @@
   "global_seq_length": 16,
   "local_radius": 16,
   "relative_pos_max_distance": 16,
-  "relative_vocab_size": 35,
+  "relative_vocab_size": 60,
   "num_attention_heads": 2,
   "num_hidden_layers": 2,
   "segment_vocab_size": 2,
