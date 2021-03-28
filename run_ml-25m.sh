@@ -32,7 +32,7 @@ python -u gen_data_fin.py \
 
 #CUDA_VISIBLE_DEVICES=0 python -u run.py \
 #    --train_input_file=${DATA_DIR}/${dataset_name}${signature}.train.tfrecord \
-#    --test_input_file=${DATA_DIR}/${dataset_name}${signature}.test.tfrecord \
+#    --test_input_file=${DATA_DIR}/${dataset_name}${signature}.valid.tfrecord \
 #    --vocab_filename=${DATA_DIR}/${dataset_name}${signature}.vocab \
 #    --user_history_filename=${DATA_DIR}/${dataset_name}${signature}.his \
 #    --checkpointDir=${CKPT_DIR}/${dataset_name} \
