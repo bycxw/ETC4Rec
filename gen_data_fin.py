@@ -554,19 +554,24 @@ def main():
             print(user_test[u])
 
     # put validate into train
-    for u in user_train:
-        if u in user_valid:
-            user_train[u].extend(user_valid[u])
+    # for u in user_train:
+    #     if u in user_valid:
+    #         user_train[u].extend(user_valid[u])
 
     # get the max index of the data
     user_train_data = {
         'user_' + str(k): ['item_' + str(item) for item in v]
         for k, v in user_train.items() if len(v) > 0
     }
+    user_valid_data = {
+        'user_' + str(u):
+            ['item_' + str(item) for item in (user_train[u] + user_valid[u])]
+        for u in user_train if len(user_train[u]) > 0 and len(user_valid[u]) > 0
+    }
     user_test_data = {
         'user_' + str(u):
-            ['item_' + str(item) for item in (user_train[u] + user_test[u])]
-        for u in user_train if len(user_train[u]) > 0 and len(user_test[u]) > 0
+            ['item_' + str(item) for item in (user_train[u] + user_valid[u] + user_test[u])]
+        for u in user_train if len(user_train[u]) > 0 and len(user_valid[u]) > 0 and len(user_test[u]) > 0
     }
     rng = random.Random(random_seed)
 
@@ -594,6 +599,25 @@ def main():
         force_last=False,
         global_seq_length=global_seq_length)
     print('train:{}'.format(output_filename))
+
+    print('begin to generate valid')
+    output_filename = os.path.join(output_dir, dataset_name + version_id + '.valid.tfrecord')
+    gen_samples(
+        user_valid_data,
+        output_filename,
+        rng,
+        vocab,
+        max_seq_length,
+        dupe_factor,
+        short_seq_prob,
+        mask_prob,
+        masked_lm_prob,
+        max_predictions_per_seq,
+        -1.0,
+        pool_size,
+        force_last=True,
+        global_seq_length=global_seq_length)
+    print('valid:{}'.format(output_filename))
 
     print('begin to generate test')
     output_filename = os.path.join(output_dir, dataset_name + version_id + '.test.tfrecord')
