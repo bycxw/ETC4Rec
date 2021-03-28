@@ -576,67 +576,73 @@ def main():
     rng = random.Random(random_seed)
 
     vocab = FreqVocab(user_test_data)
+
+    user_valid_data_output = {
+        k: [vocab.convert_tokens_to_ids(v)]
+        for k, v in user_valid_data.items()
+    }
+
     user_test_data_output = {
         k: [vocab.convert_tokens_to_ids(v)]
         for k, v in user_test_data.items()
     }
 
-    print('begin to generate train')
-    output_filename = os.path.join(output_dir, dataset_name + version_id + '.train.tfrecord')
-    gen_samples(
-        user_train_data,
-        output_filename,
-        rng,
-        vocab,
-        max_seq_length,
-        dupe_factor,
-        short_seq_prob,
-        mask_prob,
-        masked_lm_prob,
-        max_predictions_per_seq,
-        prop_sliding_window,
-        pool_size,
-        force_last=False,
-        global_seq_length=global_seq_length)
-    print('train:{}'.format(output_filename))
-
-    print('begin to generate valid')
-    output_filename = os.path.join(output_dir, dataset_name + version_id + '.valid.tfrecord')
-    gen_samples(
-        user_valid_data,
-        output_filename,
-        rng,
-        vocab,
-        max_seq_length,
-        dupe_factor,
-        short_seq_prob,
-        mask_prob,
-        masked_lm_prob,
-        max_predictions_per_seq,
-        -1.0,
-        pool_size,
-        force_last=True,
-        global_seq_length=global_seq_length)
-    print('valid:{}'.format(output_filename))
-
-    print('begin to generate test')
-    output_filename = os.path.join(output_dir, dataset_name + version_id + '.test.tfrecord')
-    gen_samples(
-        user_test_data,
-        output_filename,
-        rng,
-        vocab,
-        max_seq_length,
-        dupe_factor,
-        short_seq_prob,
-        mask_prob,
-        masked_lm_prob,
-        max_predictions_per_seq,
-        -1.0,
-        pool_size,
-        force_last=True,
-        global_seq_length=global_seq_length)
-    print('test:{}'.format(output_filename))
+    # print('begin to generate train')
+    # output_filename = os.path.join(output_dir, dataset_name + version_id + '.train.tfrecord')
+    # gen_samples(
+    #     user_train_data,
+    #     output_filename,
+    #     rng,
+    #     vocab,
+    #     max_seq_length,
+    #     dupe_factor,
+    #     short_seq_prob,
+    #     mask_prob,
+    #     masked_lm_prob,
+    #     max_predictions_per_seq,
+    #     prop_sliding_window,
+    #     pool_size,
+    #     force_last=False,
+    #     global_seq_length=global_seq_length)
+    # print('train:{}'.format(output_filename))
+    #
+    # print('begin to generate valid')
+    # output_filename = os.path.join(output_dir, dataset_name + version_id + '.valid.tfrecord')
+    # gen_samples(
+    #     user_valid_data,
+    #     output_filename,
+    #     rng,
+    #     vocab,
+    #     max_seq_length,
+    #     dupe_factor,
+    #     short_seq_prob,
+    #     mask_prob,
+    #     masked_lm_prob,
+    #     max_predictions_per_seq,
+    #     -1.0,
+    #     pool_size,
+    #     force_last=True,
+    #     global_seq_length=global_seq_length)
+    # print('valid:{}'.format(output_filename))
+    #
+    # print('begin to generate test')
+    # output_filename = os.path.join(output_dir, dataset_name + version_id + '.test.tfrecord')
+    # gen_samples(
+    #     user_test_data,
+    #     output_filename,
+    #     rng,
+    #     vocab,
+    #     max_seq_length,
+    #     dupe_factor,
+    #     short_seq_prob,
+    #     mask_prob,
+    #     masked_lm_prob,
+    #     max_predictions_per_seq,
+    #     -1.0,
+    #     pool_size,
+    #     force_last=True,
+    #     global_seq_length=global_seq_length)
+    # print('test:{}'.format(output_filename))
 
     print('vocab_size:{}, user_size:{}, item_size:{}, item_with_other_size:{}'.
           format(vocab.get_vocab_size(),
@@ -648,7 +654,13 @@ def main():
     with open(vocab_file_name, 'wb') as output_file:
         pickle.dump(vocab, output_file, protocol=2)
 
-    his_file_name = os.path.join(output_dir, dataset_name + version_id + '.his')
+    his_file_name = os.path.join(output_dir, dataset_name + version_id + 'valid.his')
+    print('valid data pickle file: ' + his_file_name)
+    with open(his_file_name, 'wb') as output_file:
+        pickle.dump(user_valid_data_output, output_file, protocol=2)
+    print('done.')
+
+    his_file_name = os.path.join(output_dir, dataset_name + version_id + 'test.his')
     print('test data pickle file: ' + his_file_name)
     with open(his_file_name, 'wb') as output_file:
         pickle.dump(user_test_data_output, output_file, protocol=2)

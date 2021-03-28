@@ -35,7 +35,7 @@ python -u gen_data_fin.py \
 #    --train_input_file=${DATA_DIR}/${dataset_name}${signature}.train.tfrecord \
 #    --test_input_file=${DATA_DIR}/${dataset_name}${signature}.valid.tfrecord \
 #    --vocab_filename=${DATA_DIR}/${dataset_name}${signature}.vocab \
-#    --user_history_filename=${DATA_DIR}/${dataset_name}${signature}.his \
+#    --user_history_filename=${DATA_DIR}/${dataset_name}${signature}.valid.his \
 #    --checkpointDir=${CKPT_DIR}/${dataset_name} \
 #    --signature=${signature}-${dim} \
 #    --do_train=True \
