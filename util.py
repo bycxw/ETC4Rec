@@ -47,6 +47,6 @@ def length_of_record(file_path):
         print(k, v, v / len(user_train))
 
 if __name__ == "__main__":
-    file_path = './data/ml-1m.txt'
+    file_path = '../datasets/ml-25m/ml-25m-100.txt'
     length_of_record(file_path)
 

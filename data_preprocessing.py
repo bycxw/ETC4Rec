@@ -114,7 +114,7 @@ def ml_preprocess(in_file_path: Path, out_file_path: Path, min_rating_num: int =
 
 
 if __name__ == "__main__":
-    MIN_RATING_NUM = 0
+    MIN_RATING_NUM = 500
     in_file_path = Path("..", "datasets", "ml-25m", "ratings.csv")
     out_file_path = Path("..", "datasets", "ml-25m", "ml-25m-{}.txt".format(MIN_RATING_NUM))
     ml_preprocess(in_file_path=in_file_path,
