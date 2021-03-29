@@ -52,7 +52,8 @@ CUDA_VISIBLE_DEVICES=0 python -u run.py \
 
 mkdir /home/mist/cloud/${dataset_name}${signature}-${dim}
 cp ${CKPT_DIR}/${dataset_name}${signature}-${dim}/eval_results.txt /home/mist/cloud/${dataset_name}${signature}-${dim}
-
+cp nohup.out /home/mist/cloud/${dataset_name}${signature}-${dim}
+remove nohup.out
 
 sleep 300
 sh ../shutdown.sh
