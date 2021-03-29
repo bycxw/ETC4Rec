@@ -37,3 +37,19 @@ hit@10:0.6745033112582781,
 ap:0.40195276939528585,
 valid_user:6040.0
 INFO:tensorflow:Inference Time : 28.58352s
+
+
+
+ml-25m-0
+bert max_seq_length=200
+etc max_seq_length=200
+
+ml-25m-100
+bert max_seq_length=200
+bert max_seq_length = 512
+etc max_seq_length = 512
+
+ml-25m-500
+bert max_seq_length=200
+bert max_seq_length=1024
+etc max_seq_legnth=1024
