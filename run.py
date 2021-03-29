@@ -191,8 +191,8 @@ class EvalHooks(tf.train.SessionRunHook):
         masked_lm_log_probs, input_ids, masked_lm_ids, info = run_values.results
         masked_lm_log_probs = masked_lm_log_probs.reshape(
             (-1, FLAGS.max_predictions_per_seq, masked_lm_log_probs.shape[1]))
-        print("loss value:", masked_lm_log_probs.shape, input_ids.shape,
-              masked_lm_ids.shape, info.shape)
+        # print("loss value:", masked_lm_log_probs.shape, input_ids.shape,
+        #       masked_lm_ids.shape, info.shape)
 
         for idx in range(len(input_ids)):
             rated = set(input_ids[idx])
