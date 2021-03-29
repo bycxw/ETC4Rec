@@ -2,7 +2,7 @@ CKPT_DIR="/home/mist/data/record"
 DATA_DIR="/home/mist/data"
 #DATA_DIR="/mnt/c/Data/dissertation/datasets/ml-25m"
 dataset_name="ml-25m-100"
-max_seq_length=200
+max_seq_length=512
 masked_lm_prob=0.2
 max_predictions_per_seq=40
 
