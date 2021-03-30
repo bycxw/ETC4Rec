@@ -4,7 +4,7 @@ DATA_DIR="/home/mist/data"
 dataset_name="ml-25m-100"
 max_seq_length=512
 masked_lm_prob=0.2
-max_predictions_per_seq=40
+max_predictions_per_seq=102
 
 dim=64
 batch_size=128
