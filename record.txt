@@ -47,9 +47,11 @@ etc max_seq_length=200
 ml-25m-100
 bert max_seq_length=200
 bert max_seq_length = 512
-etc max_seq_length = 512
+etc max_seq_length = 512 gsl=16 lra=16 mrp=16
+etc max_seq_length = 512 gsl=16 lra=32 mrp=16
 
 ml-25m-500
 bert max_seq_length=200
 bert max_seq_length=1024
-etc max_seq_legnth=1024
+etc max_seq_legnth=1024 gsl=16 lra=16 mrp=16
+etc max_seq_legnth=1024 gsl=16 lra=32 mrp=16

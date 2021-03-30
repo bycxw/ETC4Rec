@@ -80,6 +80,8 @@ flags.DEFINE_bool("do_train", False, "Whether to run training.")
 
 flags.DEFINE_bool("do_eval", False, "Whether to run eval on the dev set.")
 
+flags.DEFINE_integer("eval_every_steps", 20000, "How often to evaluate.")
+
 #flags.DEFINE_integer("train_batch_size", 32, "Total batch size for training.")
 flags.DEFINE_integer("batch_size", 32, "Total batch size for training.")
 
@@ -92,13 +94,13 @@ flags.DEFINE_integer("num_train_steps", 100000, "Number of training steps.")
 
 flags.DEFINE_integer("num_warmup_steps", 10000, "Number of warmup steps.")
 
-flags.DEFINE_integer("save_checkpoints_steps", 1000,
+flags.DEFINE_integer("save_checkpoints_steps", 50000,
                      "How often to save the model checkpoint.")
 
 flags.DEFINE_integer("iterations_per_loop", 1000,
                      "How many steps to make in each estimator call.")
 
-flags.DEFINE_integer("max_eval_steps", 1000, "Maximum number of eval steps.")
+flags.DEFINE_integer("max_eval_every_steps", 1000, "Maximum number of eval steps.")
 
 flags.DEFINE_bool("use_tpu", False, "Whether to use TPU or GPU/CPU.")
 
@@ -589,16 +591,35 @@ def main(_):
         })
 
     if FLAGS.do_train:
-        tf.logging.info("***** Running training *****")
-        tf.logging.info("  Batch size = %d", FLAGS.batch_size)
-        train_input_fn = input_fn_builder(
-            input_files=train_input_files,
-            max_seq_length=FLAGS.max_seq_length,
-            max_predictions_per_seq=FLAGS.max_predictions_per_seq,
-            is_training=True,
-            global_seq_length=FLAGS.global_seq_length)
-        estimator.train(
-            input_fn=train_input_fn, max_steps=FLAGS.num_train_steps)
+        for i in range(0, FLAGS.num_train_steps, FLAGS.eval_every_steps):
+            # train
+            tf.logging.info("***** Running training *****")
+            tf.logging.info("  Batch size = %d", FLAGS.batch_size)
+            train_input_fn = input_fn_builder(
+                input_files=train_input_files,
+                max_seq_length=FLAGS.max_seq_length,
+                max_predictions_per_seq=FLAGS.max_predictions_per_seq,
+                is_training=True,
+                global_seq_length=FLAGS.global_seq_length)
+            estimator.train(
+                input_fn=train_input_fn, max_steps=min(i + FLAGS.eval_every_steps, FLAGS.num_train_steps))
+
+            # eval
+            tf.logging.info("***** Running evaluation *****")
+            tf.logging.info("  Batch size = %d", FLAGS.batch_size)
+
+            eval_input_fn = input_fn_builder(
+                input_files=test_input_files,
+                max_seq_length=FLAGS.max_seq_length,
+                max_predictions_per_seq=FLAGS.max_predictions_per_seq,
+                is_training=False,
+                global_seq_length=FLAGS.global_seq_length)
+
+            # tf.logging.info('special eval ops:', special_eval_ops)
+            result = estimator.evaluate(
+                input_fn=eval_input_fn,
+                steps=None,
+                hooks=[EvalHooks()])
 
     if FLAGS.do_eval:
         tf.logging.info("***** Running evaluation *****")
