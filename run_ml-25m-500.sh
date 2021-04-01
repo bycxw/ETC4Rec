@@ -54,5 +54,5 @@ cp -r ${CKPT_DIR}/${dataset_name}${signature}-${dim}/ /home/mist/cloud/${dataset
 cp nohup.out /home/mist/cloud/${dataset_name}${signature}-${dim}
 #remove nohup.out
 
-sleep 300
-sh ../shutdown.sh
+#sleep 300
+#sh ../shutdown.sh
