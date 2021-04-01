@@ -66,6 +66,11 @@ def process_raw_ml(in_file_path: Path, out_file_path: Path, min_rating_num: int 
                         out_f.write("{},{}\n".format(last_userid, one_rating.movieid))
                 last_userid = userid
                 cnt = 1
+        # last user
+        if cnt >= min_rating_num:
+            sorted_ratings = sorted(ratings[last_userid], key=lambda one_rating: one_rating.timestamp)
+            for one_rating in sorted_ratings:
+                out_f.write("{},{}\n".format(last_userid, one_rating.movieid))
         print("Process raw ml data done.")
         print("Processed file: {}".format(out_file_path))
 
@@ -114,7 +119,7 @@ def ml_preprocess(in_file_path: Path, out_file_path: Path, min_rating_num: int =
 
 
 if __name__ == "__main__":
-    MIN_RATING_NUM = 500
+    MIN_RATING_NUM = 100
     in_file_path = Path("..", "datasets", "ml-25m", "ratings.csv")
     out_file_path = Path("..", "datasets", "ml-25m", "ml-25m-{}.txt".format(MIN_RATING_NUM))
     ml_preprocess(in_file_path=in_file_path,
