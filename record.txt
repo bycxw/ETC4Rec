@@ -48,10 +48,10 @@ ml-25m-100
 bert max_seq_length=200
 079 bert max_seq_length=512 bs=64 done
 etc max_seq_length = 512 gsl=16 lra=16 mrp=16
-072 etc max_seq_length = 512 gsl=16 lra=32 mrp=16 bs=128 ing
+072 etc max_seq_length = 512 gsl=16 lra=32 mrp=16 bs=64 (bs=128 oom) ing
 
 ml-25m-500
 064 bert max_seq_length=200 bs=64 done
-064 bert max_seq_length=1024 bs=64 ing
+bert max_seq_length=1024 bs=32 (bs=64 oom)
 etc max_seq_legnth=1024 gsl=16 lra=16 mrp=16
-079 etc max_seq_legnth=1024 gsl=16 lra=32 mrp=16 bs=64 (bs=128 oom) ing
+079 etc max_seq_legnth=1024 gsl=16 lra=32 mrp=16 bs=64 (bs=128 oom) done
