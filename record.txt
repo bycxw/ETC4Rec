@@ -56,6 +56,9 @@ bert max_seq_length=512 bs=32
 072 bert max_seq_length=1024 bs=32 (bs=64 oom) ing
 etc max_seq_legnth=1024 gsl=16 lra=16 mrp=16
 079 etc max_seq_legnth=1024 gsl=16 lra=32 mrp=16 bs=64 (bs=128 oom) done
-065 etc max_seq_legnth=1024 gsl=32 lra=32 mrp=16 bs=64 ing
-etc max_seq_legnth=1024 gsl=64 lra=32 mrp=16 bs=64
-etc max_seq_legnth=2048 gsl=32 lra=32 mrp=16 bs=64
+065 etc max_seq_legnth=1024 gsl=32 lra=32 mrp=16 bs=32 ing
+etc max_seq_legnth=1024 gsl=64 lra=32 mrp=16 bs=32
+072 etc max_seq_legnth=2048 gsl=32 lra=32 mrp=16 bs=32
+
+etc max_seq_length=1024 gsl=32 lra=64 mrp=16 bs=32
+etc max_seq_length=1024 gsl=32 lra=128 mrp=16 bs=32
