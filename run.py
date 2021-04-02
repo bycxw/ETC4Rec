@@ -63,6 +63,10 @@ flags.DEFINE_string(
     "Initial checkpoint (usually from a pre-trained BERT model).")
 
 flags.DEFINE_integer(
+    "start_step", 0,
+    "continue to train from start step.")
+
+flags.DEFINE_integer(
     "max_seq_length", 128,
     "The maximum total input sequence length after WordPiece tokenization. "
     "Sequences longer than this will be truncated, and sequences shorter "
@@ -591,7 +595,7 @@ def main(_):
         })
 
     if FLAGS.do_train:
-        for i in range(0, FLAGS.num_train_steps, FLAGS.eval_every_steps):
+        for i in range(FLAGS.start_step, FLAGS.num_train_steps, FLAGS.eval_every_steps):
             # train
             tf.logging.info("***** Running training *****")
             tf.logging.info("  Batch size = %d", FLAGS.batch_size)
