@@ -3,7 +3,7 @@ DATA_DIR="/home/mist/data"
 dataset_name="ml-25m-100"
 max_seq_length=512
 masked_lm_prob=0.2
-global_seq_length=16
+global_seq_length=32
 local_radius=32
 max_predictions_per_seq=102
 
@@ -16,7 +16,7 @@ mask_prob=1.0
 dupe_factor=10
 pool_size=10
 
-signature="-mp${mask_prob}-sw${prop_sliding_window}-mlp${masked_lm_prob}-df${dupe_factor}-mpps${max_predictions_per_seq}-msl${max_seq_length}-gsl${global_seq_length}-lra${local_radius}-ts${num_train_steps}"
+signature="-mp${mask_prob}-sw${prop_sliding_window}-mlp${masked_lm_prob}-df${dupe_factor}-mpps${max_predictions_per_seq}-msl${max_seq_length}-gsl${global_seq_length}-lra${local_radius}"
 
 python -u gen_data_fin.py \
     --dataset_name=${dataset_name} \

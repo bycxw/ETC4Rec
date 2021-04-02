@@ -49,7 +49,7 @@ bert max_seq_length=200
 079 bert max_seq_length=512 bs=64 done
 etc max_seq_length = 512 gsl=16 lra=16 mrp=16
 049 etc max_seq_length = 512 gsl=16 lra=32 mrp=16 bs=64 oom retry (bs=128 oom) done
-etc max_seq_length = 512 gsl=32 lra=32 mrp=16 bs=32
+079 etc max_seq_length = 512 gsl=32 lra=32 mrp=16 bs=32 ing
 
 ml-25m-500
 064 bert max_seq_length=200 bs=64 done
