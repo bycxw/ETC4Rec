@@ -4,7 +4,7 @@ dataset_name="ml-25m-500"
 max_seq_length=1024
 masked_lm_prob=0.2
 global_seq_length=32
-local_radius=64
+local_radius=32
 max_predictions_per_seq=205
 
 dim=64
