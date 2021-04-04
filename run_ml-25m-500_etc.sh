@@ -1,22 +1,24 @@
 CKPT_DIR="/home/mist/data/record"
 DATA_DIR="/home/mist/data"
 dataset_name="ml-25m-500"
-max_seq_length=1024
+max_seq_length=2048
 masked_lm_prob=0.2
 global_seq_length=32
-local_radius=64
-max_predictions_per_seq=205
+local_radius=32
+max_predictions_per_seq=410
+relative_pos_max_distance=16
 
 dim=64
 batch_size=32
-num_train_steps=200000
+num_train_steps=300000
+start_step=200000
 
 prop_sliding_window=0.5
 mask_prob=1.0
 dupe_factor=10
 pool_size=10
 
-signature="-mp${mask_prob}-sw${prop_sliding_window}-mlp${masked_lm_prob}-df${dupe_factor}-mpps${max_predictions_per_seq}-msl${max_seq_length}-gsl${global_seq_length}-lra${local_radius}"
+signature="-mp${mask_prob}-sw${prop_sliding_window}-mlp${masked_lm_prob}-df${dupe_factor}-mpps${max_predictions_per_seq}-msl${max_seq_length}-gsl${global_seq_length}-lra${local_radius}-mrp${relative_pos_max_distance}"
 
 python -u gen_data_fin.py \
     --dataset_name=${dataset_name} \
