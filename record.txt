@@ -62,6 +62,7 @@ ml-25m-500
 065 etc max_seq_legnth=1024 gsl=64 lra=32 mrp=16 bs=32 done
 072 065 etc max_seq_legnth=2048 gsl=32 lra=32 mrp=16 bs=32 done done
 079 etc max_seq_legnth=1024 gsl=16 lra=8 mrp=16 300000 ing
+049 etc max_seq_legnth=1024 gsl=16 lra=4 mrp=16 300000 ing
 
 072 etc max_seq_length=1024 gsl=32 lra=64 mrp=16 bs=32 done
 etc max_seq_length=1024 gsl=32 lra=128 mrp=16 bs=32
