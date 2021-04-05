@@ -3,15 +3,15 @@ DATA_DIR="/home/mist/data"
 dataset_name="ml-25m-500"
 max_seq_length=1024
 masked_lm_prob=0.2
-global_seq_length=16
-local_radius=16
+global_seq_length=32
+local_radius=32
 max_predictions_per_seq=205
 relative_pos_max_distance=16
 
 dim=64
 batch_size=32
 num_train_steps=300000
-start_step=0
+start_step=200000
 
 prop_sliding_window=0.5
 mask_prob=1.0
