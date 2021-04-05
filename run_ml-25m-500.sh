@@ -16,7 +16,7 @@ mask_prob=1.0
 dupe_factor=10
 pool_size=10
 
-signature="-mp${mask_prob}-sw${prop_sliding_window}-mlp${masked_lm_prob}-df${dupe_factor}-mpps${max_predictions_per_seq}-msl${max_seq_length}-ts${num_train_steps}"
+signature="-mp${mask_prob}-sw${prop_sliding_window}-mlp${masked_lm_prob}-df${dupe_factor}-mpps${max_predictions_per_seq}-msl${max_seq_length}"
 
 
 python -u gen_data_fin.py \
@@ -31,6 +31,8 @@ python -u gen_data_fin.py \
     --signature=${signature} \
     --pool_size=${pool_size} \
 
+mkdir /home/mist/cloud/${dataset_name}${signature}-${dim}
+cp run_ml-25m-500.sh /home/mist/cloud/${dataset_name}${signature}-${dim}
 
 CUDA_VISIBLE_DEVICES=0 python -u run.py \
     --train_input_file=${DATA_DIR}/${dataset_name}${signature}.train.tfrecord \
