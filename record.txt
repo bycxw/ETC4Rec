@@ -55,20 +55,22 @@ ml-25m-500
 064 bert max_seq_length=200 bs=64 done
 049 bert max_seq_length=512 bs=32 done
 072 bert max_seq_length=1024 bs=32 (bs=64 oom) done
-065 etc max_seq_legnth=1024 gsl=8 lra=32 mrp=16 300000 ing
-065 etc max_seq_legnth=1024 gsl=4 lra=32 mrp=16 300000
+065 etc max_seq_legnth=1024 gsl=8 lra=32 mrp=16 300000 done
+065 etc max_seq_legnth=1024 gsl=4 lra=32 mrp=16 300000 ing
 079 etc max_seq_legnth=1024 gsl=16 lra=16 mrp=16 300000 done
 079 079 etc max_seq_legnth=1024 gsl=16 lra=32 mrp=16 bs=64 (bs=128 oom) done bs=32 done
 065 065 etc max_seq_legnth=1024 gsl=32 lra=32 mrp=16 bs=32 300000 done done
 065 etc max_seq_legnth=1024 gsl=64 lra=32 mrp=16 bs=32 done
 072 065 etc max_seq_legnth=2048 gsl=32 lra=32 mrp=16 bs=32 done done
 079 etc max_seq_legnth=1024 gsl=16 lra=8 mrp=16 300000 done
-049 etc max_seq_legnth=1024 gsl=16 lra=4 mrp=16 300000 ing
+049 etc max_seq_legnth=1024 gsl=16 lra=4 mrp=16 300000 done
 079 etc max_seq_legnth=1024 gsl=16 lra=2 mrp=16 300000 ing
+
+049 etc max_seq_legnth=1024 gsl=16 lra=4 mrp=16 300000 ing
 
 072 etc max_seq_length=1024 gsl=32 lra=64 mrp=16 bs=32 done
 etc max_seq_length=1024 gsl=32 lra=128 mrp=16 bs=32
 072 etc max_seq_length=1024 gsl=32 lra=64 mrp=32 bs=32
 065 etc max_seq_length=1024 gsl=32 lra=32 mrp=32 bs=32 done
 
-etc max_seq_legnth=2048 gsl=16 lra=2 mrp=16 bs=32
+etc max_seq_legnth=2048 gsl=16 lra=4 mrp=16 bs=32
