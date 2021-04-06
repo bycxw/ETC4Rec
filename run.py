@@ -608,6 +608,8 @@ def main(_):
             estimator.train(
                 input_fn=train_input_fn, max_steps=min(i + FLAGS.eval_every_steps, FLAGS.num_train_steps))
 
+            if i < 100000:
+                continue
             # eval
             tf.logging.info("***** Running evaluation *****")
             tf.logging.info("  Batch size = %d", FLAGS.batch_size)

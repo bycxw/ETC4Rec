@@ -1,6 +1,5 @@
 CKPT_DIR="/home/mist/data/record"
 DATA_DIR="/home/mist/data"
-#DATA_DIR="/mnt/c/Data/dissertation/datasets/ml-25m"
 dataset_name="ml-25m-500"
 max_seq_length=512
 masked_lm_prob=0.2
@@ -8,8 +7,9 @@ max_predictions_per_seq=102
 
 dim=64
 batch_size=32
-num_train_steps=300000
-start_step=0
+num_train_steps=400000
+start_step=200000
+
 
 prop_sliding_window=0.5
 mask_prob=1.0
