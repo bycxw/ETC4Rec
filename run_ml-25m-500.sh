@@ -9,7 +9,7 @@ max_predictions_per_seq=102
 dim=64
 batch_size=32
 num_train_steps=300000
-start_step=200000
+start_step=0
 
 prop_sliding_window=0.5
 mask_prob=1.0
