@@ -72,3 +72,4 @@ etc max_seq_length=1024 gsl=32 lra=128 mrp=16 bs=32
 065 etc max_seq_length=1024 gsl=32 lra=32 mrp=32 bs=32 done
 
 049 etc max_seq_legnth=2048 gsl=16 lra=4 mrp=16 bs=32 ing
+079 etc max_seq_legnth=4096 gsl=16 lra=4 mrp=16 bs=32 ing
