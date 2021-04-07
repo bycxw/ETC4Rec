@@ -43,7 +43,7 @@ INFO:tensorflow:Inference Time : 28.58352s
 ml-25m-0
 bert max_seq_length=200
 etc max_seq_length=200
-049 etc max_seq_length = 1024 gsl=16 lra=4 mrp=16 bs=32 ing
+049 etc max_seq_length = 1024 gsl=4 lra=4 mrp=16 bs=32 ing
 
 ml-25m-100
 bert max_seq_length=200

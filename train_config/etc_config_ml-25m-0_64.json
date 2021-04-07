@@ -7,7 +7,7 @@
   "initializer_range": 0.02,
   "intermediate_size": 256,
   "max_absolute_position_embeddings": 0,
-  "global_seq_length": 16,
+  "global_seq_length": 4,
   "local_radius": 4,
   "relative_pos_max_distance": 16,
   "relative_vocab_size": 100,
