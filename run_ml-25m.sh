@@ -1,14 +1,14 @@
 CKPT_DIR="/home/mist/data/record"
 DATA_DIR="/home/mist/data"
 dataset_name="ml-25m-0"
-max_seq_length=1024
+max_seq_length=512
 masked_lm_prob=0.2
-max_predictions_per_seq=205
+max_predictions_per_seq=102
 
 dim=64
 batch_size=32
 num_train_steps=400000
-start_step=200000
+start_step=0
 eval_every_steps=40000
 
 prop_sliding_window=0.5
@@ -42,7 +42,7 @@ CUDA_VISIBLE_DEVICES=0 python -u run.py \
     --checkpointDir=${CKPT_DIR}/${dataset_name} \
     --signature=${signature}-${dim} \
     --do_train=True \
-    --do_eval=True \
+    --do_eval=False \
     --model_config_file=./train_config/bert_config_${dataset_name}_${dim}.json \
     --batch_size=${batch_size} \
     --max_seq_length=${max_seq_length} \
@@ -56,7 +56,7 @@ CUDA_VISIBLE_DEVICES=0 python -u run.py \
 
 cp ${CKPT_DIR}/${dataset_name}${signature}-${dim}/ /home/mist/cloud/${dataset_name}${signature}-${dim}
 cp nohup.out /home/mist/cloud/${dataset_name}${signature}-${dim}
-remove nohup.out
-
-sleep 300
-sh ../shutdown.sh
+#remove nohup.out
+#
+#sleep 300
+#sh ../shutdown.sh
