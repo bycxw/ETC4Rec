@@ -41,7 +41,8 @@ INFO:tensorflow:Inference Time : 28.58352s
 
 
 ml-25m-0
-bert max_seq_length=200
+079 bert max_seq_length=200 400000 ing
+065 bert max_seq_length=512 400000 ing
 etc max_seq_length=200
 049 etc max_seq_length = 1024 gsl=16 lra=4 mrp=16 bs=32 ing
 072 etc max_seq_length = 512 gsl=16 lra=4 mrp=16 bs=32 ing
@@ -57,7 +58,7 @@ ml-25m-500
 049 072 bert max_seq_length=512 bs=32 done 400000 done
 072 072 bert max_seq_length=1024 bs=32 (bs=64 oom) done 400000 done
 065 etc max_seq_legnth=512 gsl=16 lra=4 mrp=16 300000 done
-065 etc max_seq_legnth=1024 gsl=2 lra=32 mrp=16 300000 ing
+065 etc max_seq_legnth=1024 gsl=2 lra=32 mrp=16 300000 done
 065 etc max_seq_legnth=1024 gsl=8 lra=32 mrp=16 300000 done
 065 etc max_seq_legnth=1024 gsl=4 lra=32 mrp=16 300000 done
 079 etc max_seq_legnth=1024 gsl=16 lra=16 mrp=16 300000 done
@@ -75,4 +76,4 @@ etc max_seq_length=1024 gsl=32 lra=128 mrp=16 bs=32
 065 etc max_seq_length=1024 gsl=32 lra=32 mrp=32 bs=32 done
 
 049 etc max_seq_legnth=2048 gsl=16 lra=4 mrp=16 bs=32 done
-079 etc max_seq_legnth=4096 gsl=16 lra=4 mrp=16 bs=32 ing
+079 etc max_seq_legnth=4096 gsl=16 lra=4 mrp=16 bs=32 done
