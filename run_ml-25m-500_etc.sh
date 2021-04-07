@@ -5,7 +5,7 @@ max_seq_length=4096
 masked_lm_prob=0.2
 global_seq_length=16
 local_radius=4
-max_predictions_per_seq=810
+max_predictions_per_seq=820
 relative_pos_max_distance=16
 
 dim=64
