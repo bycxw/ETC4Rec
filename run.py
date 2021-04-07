@@ -608,7 +608,7 @@ def main(_):
             estimator.train(
                 input_fn=train_input_fn, max_steps=min(i + FLAGS.eval_every_steps, FLAGS.num_train_steps))
 
-            if i < 100000:
+            if i < 100000 or i + FLAGS.eval_every_steps >= FLAGS.num_train_steps:
                 continue
             # eval
             tf.logging.info("***** Running evaluation *****")
