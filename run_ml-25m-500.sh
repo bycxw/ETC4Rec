@@ -1,14 +1,14 @@
 CKPT_DIR="/home/mist/data/record"
 DATA_DIR="/home/mist/data"
 dataset_name="ml-25m-500"
-max_seq_length=1024
+max_seq_length=2048
 masked_lm_prob=0.2
-max_predictions_per_seq=205
+max_predictions_per_seq=410
 
 dim=64
 batch_size=32
-num_train_steps=400000
-start_step=200000
+num_train_steps=100000
+start_step=0
 
 
 prop_sliding_window=0.5
@@ -32,7 +32,7 @@ python -u gen_data_fin.py \
     --pool_size=${pool_size} \
 
 mkdir /home/mist/cloud/${dataset_name}${signature}-${dim}
-#cp run_ml-25m-500.sh /home/mist/cloud/${dataset_name}${signature}-${dim}
+cp run_ml-25m-500.sh /home/mist/cloud/${dataset_name}${signature}-${dim}
 
 CUDA_VISIBLE_DEVICES=0 python -u run.py \
     --train_input_file=${DATA_DIR}/${dataset_name}${signature}.train.tfrecord \
@@ -53,8 +53,8 @@ CUDA_VISIBLE_DEVICES=0 python -u run.py \
     --learning_rate=1e-4
 
 
-#mkdir /home/mist/cloud/${dataset_name}${signature}-${dim}
-#cp -r ${CKPT_DIR}/${dataset_name}${signature}-${dim}/ /home/mist/cloud/${dataset_name}${signature}-${dim}
+mkdir /home/mist/cloud/${dataset_name}${signature}-${dim}
+cp -r ${CKPT_DIR}/${dataset_name}${signature}-${dim}/ /home/mist/cloud/${dataset_name}${signature}-${dim}
 #cp nohup.out /home/mist/cloud/${dataset_name}${signature}-${dim}
 #remove nohup.out
 
