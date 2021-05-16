@@ -19,20 +19,20 @@ pool_size=10
 signature="-mp${mask_prob}-sw${prop_sliding_window}-mlp${masked_lm_prob}-df${dupe_factor}-mpps${max_predictions_per_seq}-msl${max_seq_length}"
 
 
-#python -u gen_data_fin.py \
-#    --dataset_name=${dataset_name} \
-#    --data_dir=${DATA_DIR} \
-#    --max_seq_length=${max_seq_length} \
-#    --max_predictions_per_seq=${max_predictions_per_seq} \
-#    --mask_prob=${mask_prob} \
-#    --dupe_factor=${dupe_factor} \
-#    --masked_lm_prob=${masked_lm_prob} \
-#    --prop_sliding_window=${prop_sliding_window} \
-#    --signature=${signature} \
-#    --pool_size=${pool_size} \
+python -u gen_data_fin.py \
+    --dataset_name=${dataset_name} \
+    --data_dir=${DATA_DIR} \
+    --max_seq_length=${max_seq_length} \
+    --max_predictions_per_seq=${max_predictions_per_seq} \
+    --mask_prob=${mask_prob} \
+    --dupe_factor=${dupe_factor} \
+    --masked_lm_prob=${masked_lm_prob} \
+    --prop_sliding_window=${prop_sliding_window} \
+    --signature=${signature} \
+    --pool_size=${pool_size} \
 
 mkdir /home/mist/cloud/${dataset_name}${signature}-${dim}
-cp run_ml-25m-500.sh /home/mist/cloud/${dataset_name}${signature}-${dim}
+#cp run_ml-25m-500.sh /home/mist/cloud/${dataset_name}${signature}-${dim}
 
 CUDA_VISIBLE_DEVICES=0 python -u run.py \
     --train_input_file=${DATA_DIR}/${dataset_name}${signature}.train.tfrecord \
@@ -53,9 +53,9 @@ CUDA_VISIBLE_DEVICES=0 python -u run.py \
     --learning_rate=1e-4
 
 
-mkdir /home/mist/cloud/${dataset_name}${signature}-${dim}
-cp -r ${CKPT_DIR}/${dataset_name}${signature}-${dim}/ /home/mist/cloud/${dataset_name}${signature}-${dim}
-cp nohup.out /home/mist/cloud/${dataset_name}${signature}-${dim}
+#mkdir /home/mist/cloud/${dataset_name}${signature}-${dim}
+#cp -r ${CKPT_DIR}/${dataset_name}${signature}-${dim}/ /home/mist/cloud/${dataset_name}${signature}-${dim}
+#cp nohup.out /home/mist/cloud/${dataset_name}${signature}-${dim}
 #remove nohup.out
 
 #sleep 300
