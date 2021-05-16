@@ -332,6 +332,8 @@ def model_fn_builder(model_config, init_checkpoint, learning_rate,
             tf.logging.info("  name = %s, shape = %s%s", var.name, var.shape,
                             init_string)
 
+        count_params()
+
         output_spec = None
         if mode == tf.estimator.ModeKeys.TRAIN:
             train_op = optimization.create_optimizer(total_loss, learning_rate,
@@ -389,6 +391,16 @@ def model_fn_builder(model_config, init_checkpoint, learning_rate,
 
     return model_fn
 
+
+def count_params():
+    total_parameters = 0
+    for variable in tf.trainable_variables():
+        variable_parameters = 1
+        for dim in variable.get_shape():
+            variable_parameters *= dim.value
+        total_parameters += variable_parameters
+
+    print("Total number of trainable parameters: %d" % total_parameters)
 
 def get_masked_lm_output(bert_config, input_tensor, output_weights, positions,
                          label_ids, label_weights):

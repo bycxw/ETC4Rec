@@ -54,7 +54,7 @@ CUDA_VISIBLE_DEVICES=0 python -u run.py \
     --learning_rate=1e-4
 
 
-cp ${CKPT_DIR}/${dataset_name}${signature}-${dim}/ /home/mist/cloud/${dataset_name}${signature}-${dim}
+cp -r ${CKPT_DIR}/${dataset_name}${signature}-${dim}/ /home/mist/cloud/${dataset_name}${signature}-${dim}
 cp nohup.out /home/mist/cloud/${dataset_name}${signature}-${dim}
 #remove nohup.out
 #

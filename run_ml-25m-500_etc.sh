@@ -1,12 +1,14 @@
 CKPT_DIR="/home/mist/data/record"
 DATA_DIR="/home/mist/data"
+#CKPT_DIR="/mnt/c/Data/dissertation/record"
+#DATA_DIR="/mnt/c/Data/dissertation/data"
 dataset_name="ml-25m-500"
-max_seq_length=1024
+max_seq_length=2048
 masked_lm_prob=0.2
-global_seq_length=1
-local_radius=32
-max_predictions_per_seq=205
-relative_pos_max_distance=16
+global_seq_length=2
+local_radius=2
+max_predictions_per_seq=410
+relative_pos_max_distance=2
 
 dim=64
 batch_size=16

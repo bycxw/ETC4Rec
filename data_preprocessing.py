@@ -118,10 +118,20 @@ def ml_preprocess(in_file_path: Path, out_file_path: Path, min_rating_num: int =
     os.remove(tmp_file_path)
 
 
+def count_items(file):
+    items = set()
+    with open(file, 'r', encoding='utf-8') as f:
+        for line in f:
+            line = line.strip().split()
+            items.add(int(line[1]))
+    print("num of items: ", len(items))
+    print("largest token: ", max(items))
+
 if __name__ == "__main__":
-    MIN_RATING_NUM = 100
+    MIN_RATING_NUM = 500
     in_file_path = Path("..", "datasets", "ml-25m", "ratings.csv")
     out_file_path = Path("..", "datasets", "ml-25m", "ml-25m-{}.txt".format(MIN_RATING_NUM))
-    ml_preprocess(in_file_path=in_file_path,
-                  out_file_path=out_file_path,
-                  min_rating_num=MIN_RATING_NUM)
+    # ml_preprocess(in_file_path=in_file_path,
+    #               out_file_path=out_file_path,
+    #               min_rating_num=MIN_RATING_NUM)
+    count_items(out_file_path)
