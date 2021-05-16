@@ -397,7 +397,7 @@ def count_params():
     for variable in tf.trainable_variables():
         variable_parameters = 1
         for dim in variable.get_shape():
-            variable_parameters *= dim.value
+            variable_parameters *= dim
         total_parameters += variable_parameters
 
     print("Total number of trainable parameters: %d" % total_parameters)
