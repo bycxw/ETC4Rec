@@ -21,18 +21,18 @@ pool_size=10
 
 signature="-mp${mask_prob}-sw${prop_sliding_window}-mlp${masked_lm_prob}-df${dupe_factor}-mpps${max_predictions_per_seq}-msl${max_seq_length}-gsl${global_seq_length}-lra${local_radius}-mrp${relative_pos_max_distance}"
 
-python -u gen_data_fin.py \
-    --dataset_name=${dataset_name} \
-    --data_dir=${DATA_DIR} \
-    --max_seq_length=${max_seq_length} \
-    --global_seq_length=${global_seq_length} \
-    --max_predictions_per_seq=${max_predictions_per_seq} \
-    --mask_prob=${mask_prob} \
-    --dupe_factor=${dupe_factor} \
-    --masked_lm_prob=${masked_lm_prob} \
-    --prop_sliding_window=${prop_sliding_window} \
-    --signature=${signature} \
-    --pool_size=${pool_size} \
+#python -u gen_data_fin.py \
+#    --dataset_name=${dataset_name} \
+#    --data_dir=${DATA_DIR} \
+#    --max_seq_length=${max_seq_length} \
+#    --global_seq_length=${global_seq_length} \
+#    --max_predictions_per_seq=${max_predictions_per_seq} \
+#    --mask_prob=${mask_prob} \
+#    --dupe_factor=${dupe_factor} \
+#    --masked_lm_prob=${masked_lm_prob} \
+#    --prop_sliding_window=${prop_sliding_window} \
+#    --signature=${signature} \
+#    --pool_size=${pool_size} \
 
 mkdir /home/mist/cloud/${dataset_name}${signature}-${dim}
 cp run_ml-25m_etc.sh /home/mist/cloud/${dataset_name}${signature}-${dim}
