@@ -9,7 +9,7 @@ max_predictions_per_seq=410
 relative_pos_max_distance=4
 
 dim=64
-batch_size=32
+batch_size=16
 num_train_steps=300000
 start_step=0
 eval_every_steps=40000
